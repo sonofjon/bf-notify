@@ -51,7 +51,9 @@ if new_items:
     lines = []
     for a in new_items:
         lines.append(
-            f"{a['Stadsdel']} | {a['Yta']}m2 | {a['AntalRum']}r | https://bostad.stockholm.se{a['Url']}"
+            f"{a['Stadsdel']} – {a['Gatuadress']} – "
+            f"{a['AntalRum']} rum – {a['Yta']} m2 – "
+            f"https://bostad.stockholm.se{a['Url']}"
         )
     msg.set_content("\n".join(lines))
 
