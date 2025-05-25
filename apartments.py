@@ -19,9 +19,14 @@ data = r.json()
 WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme"}
 MIN_SIZE = 35  # square meters
 MAX_ROOMS = 2
+SKIP_FLAGS = ["Ungdom", "Student", "Senior", "Korttid"]
 
 new_items = []
 for apt in data:
+    # 1) skip if any of these flags are true
+    if any(apt.get(flag, False) for flag in SKIP_FLAGS):
+        continue
+
     # 2) stadsdel/size/room guard
     stadsdel = apt.get("Stadsdel")
     rum = apt.get("AntalRum")
