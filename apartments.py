@@ -22,11 +22,15 @@ MAX_ROOMS = 2
 
 new_items = []
 for apt in data:
-    if (
-        apt["Stadsdel"] in WANT_DISTRICTS
-        and apt["Yta"] >= MIN_SIZE
-        and apt["AntalRum"] <= MAX_ROOMS
-    ):
+    # 2) stadsdel/size/room guard
+    stadsdel = apt.get("Stadsdel")
+    rum = apt.get("AntalRum")
+    yta = apt.get("Yta")
+    if yta is None or rum is None or stadsdel is None:
+        continue
+
+    # 3) filters
+    if stadsdel in WANT_DISTRICTS and rum <= MAX_ROOMS and yta >= MIN_SIZE:
         lid = apt["LägenhetId"]
         if lid not in seen:
             new_items.append(apt)
