@@ -16,10 +16,10 @@ r = requests.get("https://bostad.stockholm.se/AllaAnnonser")
 data = r.json()
 
 # 3. your filters
-WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme"}
-MIN_SIZE = 35  # square meters
-MAX_ROOMS = 2
-SKIP_FLAGS = ["Ungdom", "Student", "Senior", "Korttid"]
+WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme"}  # desired areas
+MIN_SIZE = 35  # minimum square meters
+MAX_ROOMS = 2  # maximum number of rooms
+SKIP_FLAGS = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
 
 new_items = []
 for apt in data:
