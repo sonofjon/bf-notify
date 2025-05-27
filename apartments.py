@@ -1,18 +1,20 @@
-import os
 import json
+import os
 import smtplib
 from email.message import EmailMessage
+
 import requests
 
 # 1. Load seen IDs
 SEEN_PATH = "seen.json"
 try:
-    seen = set(json.load(open(SEEN_PATH)))
+    with open(SEEN_PATH) as f:
+        seen = set(json.load(f))
 except FileNotFoundError:
     seen = set()
 
 # 2. Fetch all apartments
-r = requests.get("https://bostad.stockholm.se/AllaAnnonser")
+r = requests.get("https://bostad.stockholm.se/AllaAnnonser", timeout=10)
 data = r.json()
 
 # 3. Define filters
@@ -20,16 +22,16 @@ WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme"}  # desired areas
 SKIP_TYPES = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
 
 # Size in m2
-MIN_SIZE = 35   # minimum square meters, or None to disable
-MAX_SIZE = None # maximum square meters, or None to disable
+MIN_SIZE = 35  # minimum square meters, or None to disable
+MAX_SIZE = None  # maximum square meters, or None to disable
 
 # Room count
 MIN_ROOMS = None  # minimum rooms, or None to disable
-MAX_ROOMS = 2     # maximum rooms, or None to disable
+MAX_ROOMS = 2  # maximum rooms, or None to disable
 
 # Rent in kr/month
-MIN_RENT = None   # minimum rent, or None to disable
-MAX_RENT = None   # maximum rent, or None to disable
+MIN_RENT = None  # minimum rent, or None to disable
+MAX_RENT = None  # maximum rent, or None to disable
 
 new_items = []
 for apt in data:
@@ -67,17 +69,18 @@ if new_items:
     msg["From"] = os.environ["EMAIL_FROM"]
     msg["To"] = os.environ["EMAIL_TO"]
 
-    lines = []
-    for a in new_items:
-        lines.append(
-            f"{a['Stadsdel']} – {a['Gatuadress']} – "
-            f"{a['AntalRum']} rum – {a['Yta']} m2 – "
-            f"{a['Hyra']} kr/mån – "
-            f"https://bostad.stockholm.se{a['Url']}"
-        )
+    lines = [
+        f"{a['Stadsdel']} - {a['Gatuadress']} - "
+        f"{a['AntalRum']} rum - {a['Yta']} m2 - "
+        f"{a['Hyra']} kr/mån - "
+        f"https://bostad.stockholm.se{a['Url']}"
+        for a in new_items
+    ]
     msg.set_content("\n".join(lines))
 
-    with smtplib.SMTP(os.environ["SMTP_SERVER"], int(os.environ["SMTP_PORT"])) as smtp:
+    with smtplib.SMTP(
+        os.environ["SMTP_SERVER"], int(os.environ["SMTP_PORT"])
+    ) as smtp:
         smtp.starttls()
         smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_PASSWORD"])
         smtp.send_message(msg)
