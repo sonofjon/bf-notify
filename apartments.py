@@ -15,27 +15,46 @@ except FileNotFoundError:
 r = requests.get("https://bostad.stockholm.se/AllaAnnonser")
 data = r.json()
 
-# 3. your filters
+# 3. define filters
 WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme"}  # desired areas
-MIN_SIZE = 35  # minimum square meters
-MAX_ROOMS = 2  # maximum number of rooms
 SKIP_TYPES = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
+
+# Size in m2
+MIN_SIZE = 35   # minimum square meters, or None to disable
+MAX_SIZE = None # maximum square meters, or None to disable
+
+# Room count
+MIN_ROOMS = None  # minimum rooms, or None to disable
+MAX_ROOMS = 2     # maximum rooms, or None to disable
+
+# Rent in kr/month
+MIN_RENT = None   # minimum rent, or None to disable
+MAX_RENT = None   # maximum rent, or None to disable
 
 new_items = []
 for apt in data:
-    # 1) skip if any of these types are true
+    # 1) skip unwanted types
     if any(apt.get(flag, False) for flag in SKIP_TYPES):
         continue
 
-    # 2) stadsdel/size/room guard
+    # 2) skip items with missing data
     stadsdel = apt.get("Stadsdel")
     rum = apt.get("AntalRum")
     yta = apt.get("Yta")
-    if yta is None or rum is None or stadsdel is None:
+    rent = apt.get("Hyra")
+    if None in (stadsdel, rum, yta, rent):
         continue
 
-    # 3) filters
-    if stadsdel in WANT_DISTRICTS and rum <= MAX_ROOMS and yta >= MIN_SIZE:
+    # 3) apply filters
+    if (
+        stadsdel in WANT_DISTRICTS
+        and (MIN_SIZE is None or yta >= MIN_SIZE)
+        and (MAX_SIZE is None or yta <= MAX_SIZE)
+        and (MIN_ROOMS is None or rum >= MIN_ROOMS)
+        and (MAX_ROOMS is None or rum <= MAX_ROOMS)
+        and (MIN_RENT is None or rent >= MIN_RENT)
+        and (MAX_RENT is None or rent <= MAX_RENT)
+    ):
         lid = apt["LägenhetId"]
         if lid not in seen:
             new_items.append(apt)
@@ -58,7 +77,6 @@ if new_items:
         )
     msg.set_content("\n".join(lines))
 
-    # SMTP send
     with smtplib.SMTP(os.environ["SMTP_SERVER"], int(os.environ["SMTP_PORT"])) as smtp:
         smtp.starttls()
         smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_PASSWORD"])

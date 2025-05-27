@@ -107,9 +107,19 @@ All the filtering logic lives at the top of `apartments.py`:
 
 ```python
 WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme"}  # desired areas
-MIN_SIZE      = 35  # minimum square meters
-MAX_ROOMS     = 2   # maximum number of rooms
-SKIP_TYPES    = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
+SKIP_TYPES = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
+
+# Size in m2
+MIN_SIZE = 35   # minimum square meters, or None to disable
+MAX_SIZE = None # maximum square meters, or None to disable
+
+# Room count
+MIN_ROOMS = None  # minimum rooms, or None to disable
+MAX_ROOMS = 2     # maximum rooms, or None to disable
+
+# Rent in kr/month
+MIN_RENT = None   # minimum rent, or None to disable
+MAX_RENT = None   # maximum rent, or None to disable
 ```
 
 Adjust these values to match your preferences.
