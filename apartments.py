@@ -53,6 +53,7 @@ if new_items:
         lines.append(
             f"{a['Stadsdel']} – {a['Gatuadress']} – "
             f"{a['AntalRum']} rum – {a['Yta']} m2 – "
+            f"{a['Hyra']} kr/månad – "
             f"https://bostad.stockholm.se{a['Url']}"
         )
     msg.set_content("\n".join(lines))
