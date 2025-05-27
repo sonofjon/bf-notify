@@ -38,20 +38,20 @@ for apt in data:
         continue
 
     # 2) skip items with missing data
-    stadsdel = apt.get("Stadsdel")
-    rum = apt.get("AntalRum")
-    yta = apt.get("Yta")
+    district = apt.get("Stadsdel")
+    rooms = apt.get("AntalRum")
+    size = apt.get("Yta")
     rent = apt.get("Hyra")
-    if None in (stadsdel, rum, yta, rent):
+    if None in (district, rooms, size, rent):
         continue
 
     # 3) apply filters
     if (
-        stadsdel in WANT_DISTRICTS
-        and (MIN_SIZE is None or yta >= MIN_SIZE)
-        and (MAX_SIZE is None or yta <= MAX_SIZE)
-        and (MIN_ROOMS is None or rum >= MIN_ROOMS)
-        and (MAX_ROOMS is None or rum <= MAX_ROOMS)
+        district in WANT_DISTRICTS
+        and (MIN_SIZE is None or size >= MIN_SIZE)
+        and (MAX_SIZE is None or size <= MAX_SIZE)
+        and (MIN_ROOMS is None or rooms >= MIN_ROOMS)
+        and (MAX_ROOMS is None or rooms <= MAX_ROOMS)
         and (MIN_RENT is None or rent >= MIN_RENT)
         and (MAX_RENT is None or rent <= MAX_RENT)
     ):
