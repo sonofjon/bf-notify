@@ -4,18 +4,18 @@ import smtplib
 from email.message import EmailMessage
 import requests
 
-# 1. load seen IDs
+# 1. Load seen IDs
 SEEN_PATH = "seen.json"
 try:
     seen = set(json.load(open(SEEN_PATH)))
 except FileNotFoundError:
     seen = set()
 
-# 2. fetch all apartments
+# 2. Fetch all apartments
 r = requests.get("https://bostad.stockholm.se/AllaAnnonser")
 data = r.json()
 
-# 3. define filters
+# 3. Define filters
 WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme"}  # desired areas
 SKIP_TYPES = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
 
@@ -33,11 +33,11 @@ MAX_RENT = None   # maximum rent, or None to disable
 
 new_items = []
 for apt in data:
-    # 1) skip unwanted types
+    # 1) Skip unwanted types
     if any(apt.get(flag, False) for flag in SKIP_TYPES):
         continue
 
-    # 2) skip items with missing data
+    # 2) Skip items with missing data
     district = apt.get("Stadsdel")
     rooms = apt.get("AntalRum")
     size = apt.get("Yta")
@@ -45,7 +45,7 @@ for apt in data:
     if None in (district, rooms, size, rent):
         continue
 
-    # 3) apply filters
+    # 3) Apply filters
     if (
         district in WANT_DISTRICTS
         and (MIN_SIZE is None or size >= MIN_SIZE)
@@ -60,7 +60,7 @@ for apt in data:
             new_items.append(apt)
             seen.add(lid)
 
-# 4. if new, send email
+# 4. If new, send email
 if new_items:
     msg = EmailMessage()
     msg["Subject"] = f"New apartments: {len(new_items)}"
@@ -72,7 +72,7 @@ if new_items:
         lines.append(
             f"{a['Stadsdel']} – {a['Gatuadress']} – "
             f"{a['AntalRum']} rum – {a['Yta']} m2 – "
-            f"{a['Hyra']} kr/månad – "
+            f"{a['Hyra']} kr/mån – "
             f"https://bostad.stockholm.se{a['Url']}"
         )
     msg.set_content("\n".join(lines))
@@ -82,6 +82,6 @@ if new_items:
         smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_PASSWORD"])
         smtp.send_message(msg)
 
-# 5. write back seen.json
+# 5. Write back seen.json
 with open(SEEN_PATH, "w") as f:
     json.dump(sorted(seen), f)
