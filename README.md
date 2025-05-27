@@ -5,9 +5,7 @@ A simple Python-based watcher that checks the
 listings matching your criteria and emails you a daily summary.
 
 Runs once per day via GitHub Actions (free), maintaining state in a flat
-JSON-file so you only get notified once per listing.
-
----
+JSON-file, so you only get notified once per listing.
 
 ## Table of Contents
 
@@ -19,8 +17,6 @@ JSON-file so you only get notified once per listing.
 6. [Custom Filters](#custom-filters)
 7. [License](#license)
 
----
-
 ## Features
 
 - Fetches all apartments from `https://bostad.stockholm.se/AllaAnnonser`.
@@ -30,15 +26,11 @@ JSON-file so you only get notified once per listing.
 - Sends email via any SMTP server (Gmail, Mailgun, etc.).
 - Scheduled daily (08:00 UTC) with GitHub Actions.
 
----
-
 ## Prerequisites
 
 - Python 3.7+ for local testing.
 - An SMTP account of your choice that supports TLS (e.g. Gmail with an App Password).
 - A GitHub account and a repository to host this code.
-
----
 
 ## Installation
 
@@ -52,8 +44,6 @@ JSON-file so you only get notified once per listing.
    ```bash
    pip install -r requirements.txt
    ```
-
----
 
 ## Configuration
 
@@ -76,8 +66,6 @@ export EMAIL_TO=you@example.com
 1. In your GitHub repo, go to **Settings → Secrets and variables → Actions → Repository secrets**.
 2. Add the same six environment variables as for local testing above.
 
----
-
 ## Usage
 
 ### Local Run
@@ -98,8 +86,6 @@ Once your code and workflow are pushed to your GitHub repo:
 
 1. Navigate to **Actions → Daily apartment check → Run workflow** to test it immediately.
 2. The workflow will also run automatically every day at 08:00 UTC, fetch new listings, send you an email, and update `seen.json`.
-
----
 
 ## Custom Filters
 
