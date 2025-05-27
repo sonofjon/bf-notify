@@ -4,7 +4,8 @@ A simple Python-based watcher that checks the
 [Bostadsförmedlingen](https://bostad.stockholm.se) site for new apartment
 listings matching your criteria and emails you a daily summary.
 
-Runs once per day via GitHub Actions (free), maintaining state in a flat
+The application can be run manually on a local machine, or, automatically
+using GitHub Actions. It then runs once per day, maintaining state in a flat
 JSON-file, so you only get notified once per listing.
 
 ## Table of Contents
@@ -19,7 +20,7 @@ JSON-file, so you only get notified once per listing.
 ## Features
 
 - Fetches all apartments from `https://bostad.stockholm.se/AllaAnnonser`.
-- Filters by district, size, room count, rent.
+- Filters by district, size, room count, and rent.
 - Skips special-purpose listings (youth, student, senior, short-term).
 - Tracks seen apartment IDs in `seen.json`.
 - Sends email via any SMTP server (Gmail, Mailgun, etc.).
@@ -28,14 +29,18 @@ JSON-file, so you only get notified once per listing.
 ## Prerequisites
 
 - Python 3.7+ for local testing.
-- An SMTP account of your choice that supports TLS (e.g. Gmail with an App Password).
+- An SMTP account that supports TLS (e.g. Gmail with an App password).
 - A GitHub account and a repository to host this code.
 
 ## Installation
 
 ### Local Testing
 
-1. Clone or fork this repository.
+1. Clone this repository:
+   ```bash
+   git clone https://github.com/sonofjon/bf-notify.git
+   cd bf-notify
+   ```
 2. (Optional) Create and activate a virtual environment:
    ```bash
    python3 -m venv .venv
@@ -48,7 +53,8 @@ JSON-file, so you only get notified once per listing.
 
 ### GitHub Actions
 
-No additional setup is required in the repository itself beyond committing your code and workflow file. Dependencies are installed automatically by the workflow.
+1. Fork this repository on GitHub (your fork will host the workflow).
+2. No local install needed — the Actions runner installs the required dependencies.
 
 ## Configuration
 
@@ -67,7 +73,7 @@ export EMAIL_TO=you@example.com
 
 ### GitHub Actions
 
-In your GitHub repository, go to **Settings → Secrets and variables → Actions** and add these same six secrets:
+In your **fork** on GitHub, go to **Settings → Secrets and variables → Actions** and add these secrets:
 
 - `SMTP_SERVER`
 - `SMTP_PORT`
@@ -76,11 +82,13 @@ In your GitHub repository, go to **Settings → Secrets and variables → Action
 - `EMAIL_FROM`
 - `EMAIL_TO`
 
+No other configuration is needed.
+
 ## Usage
 
 ### Local Testing
 
-1. Make sure `seen.json` is present and empty (or has previous IDs):
+1. Initialize or reset your seen-IDs file:
    ```bash
    echo "[]" > seen.json
    ```
@@ -88,14 +96,13 @@ In your GitHub repository, go to **Settings → Secrets and variables → Action
    ```bash
    python apartments.py
    ```
-3. Check your inbox for an email summary (if any matches) and inspect `seen.json` for added IDs.
+3. Inspect your inbox (for any matches) and `seen.json` (for new IDs).
 
 ### GitHub Actions
 
-Once the code and workflow are pushed to your GitHub repo:
-
-1. Navigate to **Actions → Daily apartment check → Run workflow** to test it immediately.
-2. The workflow will also run automatically every day at 08:00 UTC, fetch new listings, send you an email, and update `seen.json`.
+1. Push or merge any changes to your fork.
+2. In your fork on GitHub, go to **Actions → Daily apartment check → Run workflow** to trigger it.
+3. The workflow will thereafter run automatically each day at 08:00 UTC, send emails for new listings, and update `seen.json` in your repo.
 
 ## Custom Filters
 
