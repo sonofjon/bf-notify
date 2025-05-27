@@ -1,15 +1,21 @@
 name: Daily apartment check
+
+# Make sure the GITHUB_TOKEN can write back to the repo
+permissions:
+  contents: write        # <-- grant write on repo contents
+
 on:
   schedule:
-    - cron:  '0 8 * * *'   # every day 08:00 UTC
-  workflow_dispatch:      # allows manual runs
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
 jobs:
   check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
-          persist-credentials: true   # so we can push commits
+          persist-credentials: true   # this makes checkout use the GITHUB_TOKEN
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
