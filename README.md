@@ -15,12 +15,11 @@ JSON-file, so you only get notified once per listing.
 4. [Configuration](#configuration)
 5. [Usage](#usage)
 6. [Custom Filters](#custom-filters)
-7. [License](#license)
 
 ## Features
 
 - Fetches all apartments from `https://bostad.stockholm.se/AllaAnnonser`.
-- Filters by district, size, room count.
+- Filters by district, size, room count, rent.
 - Skips special-purpose listings (youth, student, senior, short-term).
 - Tracks seen apartment IDs in `seen.json`.
 - Sends email via any SMTP server (Gmail, Mailgun, etc.).
@@ -34,8 +33,10 @@ JSON-file, so you only get notified once per listing.
 
 ## Installation
 
-1. Fork or clone this repository into your own GitHub account.
-2. (Optional) Create a Python virtual environment:
+### Local Testing
+
+1. Clone or fork this repository.
+2. (Optional) Create and activate a virtual environment:
    ```bash
    python3 -m venv .venv
    source .venv/bin/activate
@@ -45,12 +46,15 @@ JSON-file, so you only get notified once per listing.
    pip install -r requirements.txt
    ```
 
+### GitHub Actions
+
+No additional setup is required in the repository itself beyond committing your code and workflow file. Dependencies are installed automatically by the workflow.
+
 ## Configuration
 
 ### Local Testing
 
-Before running the script locally, export the required environment variables
-(adjust values to your SMTP provider) in your shell:
+Before running locally, export the required environment variables in your shell:
 
 ```bash
 export SMTP_SERVER=smtp.example.com
@@ -61,14 +65,20 @@ export EMAIL_FROM=alerts@example.com
 export EMAIL_TO=you@example.com
 ```
 
-### GitHub Actions Secrets
+### GitHub Actions
 
-1. In your GitHub repo, go to **Settings → Secrets and variables → Actions → Repository secrets**.
-2. Add the same six environment variables as for local testing above.
+In your GitHub repository, go to **Settings → Secrets and variables → Actions** and add these same six secrets:
+
+- `SMTP_SERVER`
+- `SMTP_PORT`
+- `SMTP_USER`
+- `SMTP_PASSWORD`
+- `EMAIL_FROM`
+- `EMAIL_TO`
 
 ## Usage
 
-### Local Run
+### Local Testing
 
 1. Make sure `seen.json` is present and empty (or has previous IDs):
    ```bash
@@ -80,9 +90,9 @@ export EMAIL_TO=you@example.com
    ```
 3. Check your inbox for an email summary (if any matches) and inspect `seen.json` for added IDs.
 
-### Daily Automation via GitHub Actions
+### GitHub Actions
 
-Once your code and workflow are pushed to your GitHub repo:
+Once the code and workflow are pushed to your GitHub repo:
 
 1. Navigate to **Actions → Daily apartment check → Run workflow** to test it immediately.
 2. The workflow will also run automatically every day at 08:00 UTC, fetch new listings, send you an email, and update `seen.json`.
