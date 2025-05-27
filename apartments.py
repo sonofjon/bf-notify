@@ -19,12 +19,12 @@ data = r.json()
 WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme"}  # desired areas
 MIN_SIZE = 35  # minimum square meters
 MAX_ROOMS = 2  # maximum number of rooms
-SKIP_FLAGS = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
+SKIP_TYPES = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
 
 new_items = []
 for apt in data:
-    # 1) skip if any of these flags are true
-    if any(apt.get(flag, False) for flag in SKIP_FLAGS):
+    # 1) skip if any of these types are true
+    if any(apt.get(flag, False) for flag in SKIP_TYPES):
         continue
 
     # 2) stadsdel/size/room guard

@@ -109,7 +109,7 @@ All the filtering logic lives at the top of `apartments.py`:
 WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme"}  # desired areas
 MIN_SIZE      = 35  # minimum square meters
 MAX_ROOMS     = 2   # maximum number of rooms
-SKIP_FLAGS    = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
+SKIP_TYPES    = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
 ```
 
 Adjust these values to match your preferences.
