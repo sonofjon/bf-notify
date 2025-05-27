@@ -1,39 +1,38 @@
-   name: Daily apartment check
-   on:
-     schedule:
-       - cron:  '0 8 * * *'   # every day 08:00 UTC
-     workflow_dispatch:      # allows manual runs
-
-   jobs:
-     check:
-       runs-on: ubuntu-latest
-       steps:
-         - uses: actions/checkout@v3
-           with:
-             persist-credentials: true   # so we can push commits
-         - name: Set up Python
-           uses: actions/setup-python@v4
-           with:
-             python-version: '3.x'
-         - name: Install deps
-           run: pip install -r requirements.txt
-         - name: Run watcher
-           env:
-             SMTP_SERVER:   ${{ secrets.SMTP_SERVER }}
-             SMTP_PORT:     ${{ secrets.SMTP_PORT }}
-             SMTP_USER:     ${{ secrets.SMTP_USER }}
-             SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-             EMAIL_FROM:    ${{ secrets.EMAIL_FROM }}
-             EMAIL_TO:      ${{ secrets.EMAIL_TO }}
-           run: python apartments.py
-         - name: Commit updated seen.json
-           run: |
-             git config user.name "github-actions[bot]"
-             git config user.email "github-actions[bot]@users.noreply.github.com"
-             git add seen.json
-             if ! git diff --quiet --cached; then
-               git commit -m "chore: update seen.json"
-               git push
-             else
-               echo "No changes in seen.json"
-             fi
+name: Daily apartment check
+on:
+  schedule:
+    - cron:  '0 8 * * *'   # every day 08:00 UTC
+  workflow_dispatch:      # allows manual runs
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: true   # so we can push commits
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Run watcher
+        env:
+          SMTP_SERVER:   ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT:     ${{ secrets.SMTP_PORT }}
+          SMTP_USER:     ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          EMAIL_FROM:    ${{ secrets.EMAIL_FROM }}
+          EMAIL_TO:      ${{ secrets.EMAIL_TO }}
+        run: python apartments.py
+      - name: Commit updated seen.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add seen.json
+          if ! git diff --quiet --cached; then
+            git commit -m "chore: update seen.json"
+            git push
+          else
+            echo "No changes in seen.json"
+          fi
