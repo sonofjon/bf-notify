@@ -1,3 +1,13 @@
+"""Watch Stockholm housing site for new apartments and email daily summaries.
+
+Fetches listings from bostad.stockholm.se, applies user-defined filters,
+tracks seen IDs in a JSON file, and sends notifications via SMTP.
+
+Author: Andreas jonsson
+Contact: ajdev8@gmail.com
+GitHub: https://github.com/sonofjon/bf-notify
+"""
+
 import json
 import os
 import smtplib
