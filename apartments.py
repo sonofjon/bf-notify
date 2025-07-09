@@ -28,7 +28,8 @@ r = requests.get("https://bostad.stockholm.se/AllaAnnonser", timeout=10)
 data = r.json()
 
 # 3. Define filters
-WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme"}  # desired areas
+WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme", "Skeppsholmen",
+                  "Gamla Stan"}  # desired areas
 SKIP_TYPES = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
 
 # Size in m2
