@@ -129,7 +129,7 @@ its own tracking and sends a separate email.
       "exclude_types": ["Ungdom", "Student", "Senior", "Korttid"],
       "size": {"min": null, "max": null},
       "rooms": {"min": 3, "max": 3},
-      "rent": {"min": null, "max": 15000}
+      "rent": {"min": null, "max": 12000}
     },
     {
       "id": 2,
@@ -142,7 +142,7 @@ its own tracking and sends a separate email.
       "exclude_types": null,
       "size": {"min": null, "max": null},
       "rooms": {"min": null, "max": 3},
-      "rent": {"min": null, "max": null}
+      "rent": {"min": null, "max": 15000}
     }
   ]
 }
