@@ -133,14 +133,14 @@ its own tracking and sends a separate email.
     },
     {
       "id": 2,
-      "name": "1-3 room apartments (short-term, with max price)",
+      "name": "1-3 room apartments (short-term, with min size, max price)",
       "include_municipalities": null,
       "exclude_municipalities": null,
       "include_districts": ["Södermalm", "Långholmen", "Reimersholme"],
       "exclude_districts": null,
       "include_types": ["Korttid"],
       "exclude_types": null,
-      "size": {"min": null, "max": null},
+      "size": {"min": 35, "max": null},
       "rooms": {"min": null, "max": 3},
       "rent": {"min": null, "max": 15000}
     }
