@@ -21,10 +21,11 @@ JSON-file, so you only get notified once per listing.
 ## Features
 
 - Fetches all listings from `https://bostad.stockholm.se/AllaAnnonser`.
-- Filters by district, size, room count, and rent.
-- Skips special-purpose listings (youth, student, senior, short-term).
-- Tracks seen apartment IDs in `seen.json`.
-- Sends email summaries via any SMTP server.
+- Supports multiple independent queries with different filter criteria.
+- Filters by municipality, district, apartment type, size, room count, and rent.
+- Include or exclude specific municipalities, districts, and apartment types.
+- Tracks seen apartment IDs per query in `seen_*.json` files.
+- Sends separate email per query with matching apartments.
 - Scheduled daily (08:00 UTC) with GitHub Actions (optional).
 
 ## Prerequisites
@@ -65,10 +66,10 @@ export EMAIL_TO=you@example.com
 
 ## Usage
 
-Just run:
+Run the apartment watcher:
 
 ```bash
-python apartments.py
+python run.py
 ```
 
 ## GitHub Actions
@@ -83,8 +84,8 @@ The repo includes a workflow (`.github/workflows/daily.yml`) that:
 
 1. Checks out your repo
 2. Installs dependencies
-3. Runs `python apartments.py`
-4. Commits & pushes back any changes to `seen.json`
+3. Runs `python run.py`
+4. Commits & pushes back any changes to `seen_*.json` files
 
 To trigger it manually:
 
@@ -95,23 +96,124 @@ The workflow runs automatically at 08:00 UTC every day.
 
 ## Custom Filters
 
-All the filtering logic lives at the top of `apartments.py`:
+Define multiple queries in `config.json`. Each query runs independently with
+its own tracking and sends a separate email.
 
-```python
-WANT_DISTRICTS = {"Södermalm", "Långholmen", "Reimerholme"}  # desired areas
-SKIP_TYPES = ["Ungdom", "Student", "Senior", "Korttid"]  # types to skip
+### Example Configuration
 
-# Size in m2
-MIN_SIZE = 35   # minimum square meters, or None to disable
-MAX_SIZE = None # maximum square meters, or None to disable
-
-# Room count
-MIN_ROOMS = None  # minimum rooms, or None to disable
-MAX_ROOMS = 2     # maximum rooms, or None to disable
-
-# Rent in kr/month
-MIN_RENT = None   # minimum rent, or None to disable
-MAX_RENT = None   # maximum rent, or None to disable
+```json
+{
+  "skip_incomplete": false,
+  "queries": [
+    {
+      "id": 0,
+      "name": "1-2 room apartments (with min size)",
+      "include_municipalities": null,
+      "exclude_municipalities": null,
+      "include_districts": ["Södermalm", "Långholmen", "Reimersholme"],
+      "exclude_districts": null,
+      "include_types": null,
+      "exclude_types": ["Ungdom", "Student", "Senior", "Korttid"],
+      "size": {"min": 35, "max": null},
+      "rooms": {"min": null, "max": 2},
+      "rent": {"min": null, "max": null}
+    },
+    {
+      "id": 1,
+      "name": "3-room apartments (with max price)",
+      "include_municipalities": null,
+      "exclude_municipalities": null,
+      "include_districts": ["Södermalm", "Långholmen", "Reimersholme"],
+      "exclude_districts": null,
+      "include_types": null,
+      "exclude_types": ["Ungdom", "Student", "Senior", "Korttid"],
+      "size": {"min": null, "max": null},
+      "rooms": {"min": 3, "max": 3},
+      "rent": {"min": null, "max": 15000}
+    },
+    {
+      "id": 2,
+      "name": "1-3 room apartments (short-term, with max price)",
+      "include_municipalities": null,
+      "exclude_municipalities": null,
+      "include_districts": ["Södermalm", "Långholmen", "Reimersholme"],
+      "exclude_districts": null,
+      "include_types": ["Korttid"],
+      "exclude_types": null,
+      "size": {"min": null, "max": null},
+      "rooms": {"min": null, "max": 3},
+      "rent": {"min": null, "max": null}
+    }
+  ]
+}
 ```
 
-Adjust these values to match your preferences.
+### Configuration Fields
+
+**Global Settings**
+
+**`skip_incomplete`**
+- Whether to skip apartments with missing data (size, rent, etc.)
+- Set to `false` to include apartments even if they have missing fields
+- Note: About 10% of apartments have missing size/rent data
+
+**Per-Query Settings**
+
+**`id`**
+- Unique numeric identifier for the query
+
+**`name`**
+- Human-readable query name
+
+**`include_municipalities`**
+- List of municipalities to include in results
+- Example: `["Stockholm", "Solna"]`
+
+**`exclude_municipalities`**
+- List of municipalities to exclude from results
+- Example: `["Järfälla", "Botkyrka"]`
+
+**`include_districts`**
+- List of districts to include in results
+- Example: `["Södermalm", "Långholmen"]`
+
+**`exclude_districts`**
+- List of districts to exclude from results
+- Example: `["Farsta", "Skärholmen"]`
+
+**`include_types`**
+- List of apartment types to include in results
+- Example: `["Vanlig", "Korttid"]`
+
+**`exclude_types`**
+- List of apartment types to exclude from results
+- Example: `["Ungdom", "Student", "Senior", "BostadSnabbt"]`
+
+**`size`**
+- Square meter limits
+- Example: `{"min": 35, "max": null}`
+
+**`rooms`**
+- Room count limits
+- Example: `{"min": 3, "max": 3}`
+
+**`rent`**
+- Monthly rent limits in SEK
+- Example: `{"min": null, "max": 15000}`
+
+**Apartment types**
+
+The following types are available (mutually exclusive):
+- `Vanlig` - Regular apartments (most common)
+- `Student` - Student housing
+- `Ungdom` - Youth housing
+- `Senior` - Senior housing
+- `Korttid` - Short-term rentals
+- `BostadSnabbt` - Fast housing program
+
+### Important Notes
+
+- Use `null` to disable any filter or limit (matches all values)
+- Each query ID must be unique
+- For municipalities, districts, and types: only one of the include or exclude variants can be non-null in each query
+- To add a new query, use the next available `id` number
