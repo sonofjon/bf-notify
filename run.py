@@ -249,7 +249,7 @@ def main():
         new_items = []
         for apt in apartments:
             if matches_query(apt, query, skip_incomplete):
-                lid = apt["LägenhetId"]
+                lid = apt["LagenhetId"]
                 if lid not in seen:
                     new_items.append(apt)
                     seen.add(lid)
